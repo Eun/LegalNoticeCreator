@@ -1,6 +1,6 @@
-LegalNoticeGenerator
+LegalNoticeCreator
 ====================
-Go [http://eun.github.io/LegalNoticeGenerator](http://eun.github.io/LegalNoticeGenerator).
+Go [http://eun.github.io/LegalNoticeCreator](http://eun.github.io/LegalNoticeCreator).
 
 Changelog
 =========
