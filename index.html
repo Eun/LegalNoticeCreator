@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="author" content="Eun"/>
+		<meta name="keywords" content="LegalNoticeGenerator, Legal, Notice, Generator, Windows, Boot, BootScreen, Login, Logon, Windows 8, Windows 7, Windows Vista, Windows XP, Open Source, GitHub, Eun"/>
+		<meta name="description" content="Allows you to show a notice before login on Windows machines."/>
+		<title>Legal Notice Creator</title>
+		<script type="text/javascript">
+			function pad(num, size) {
+				var s = num+"";
+				while (s.length < size)
+					s = "0" + s;
+				return s;
+			}
+
+			function makeHexString(str) {
+				var hexStr = "";
+				for (var i = 0, l = str.length; i < l; ++i) {
+					var hex = pad(str.charCodeAt(i).toString(16), 4);
+					if (hex == "000a")
+						hex = "000d"
+					hexStr += ","
+					hexStr += hex.substr(2,2);
+					hexStr += ","  		
+					hexStr += hex.substr(0,2);
+				}
+				return hexStr.substr(1);
+			}
+
+			function download(filename, text) {
+				var pom = document.createElement('a');
+				pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+				pom.setAttribute('download', filename);
+				pom.click();
+			}
+
+			function generateReg(title, text) {
+				return "Windows Registry Editor Version 5.00\r\n\r\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System]\r\n\"legalnoticecaption\"=" + title + "\r\n\"legalnoticetext\"=" + text + "\r\n\r\n";
+			}
+
+			function generateNotice() {
+				var noticeData = generateReg("hex(1):" + makeHexString(document.getElementById("title").value), "hex(1):" + makeHexString(document.getElementById("text").value));
+				download("notice-perma-" + new Date().getTime() + ".reg", noticeData);
+				return false;
+			}
+
+			function generateOneTimeNotice()
+			{
+				var noticeData = generateReg("hex(1):" + makeHexString(document.getElementById("title").value), "hex(1):" + makeHexString(document.getElementById("text").value));
+				noticeData += "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce]\r\n\"RemoveLegalNoticeTitle\"=\"REG ADD HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System /t REG_SZ /v legalnoticecaption /d \\\"\\\" /f\"\r\n\"RemoveLegalNoticeContent\"=\"REG ADD HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System /t REG_SZ /v legalnoticetext /d \\\"\\\" /f\"\r\n";
+				download("notice-one-time-" + new Date().getTime() + ".reg", noticeData);
+			}
+
+
+			function generateReset() {
+				var noticeData = generateReg("", "");
+				download("notice-reset.reg", noticeData);
+				return false;
+			}
+		</script>
+		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="gh-fork-ribbon.css">
+		<!--[if lt IE 9]>
+			<link rel="stylesheet" href="gh-fork-ribbon.ie.css">
+		<![endif]-->
+		<noscript>
+			<style type="text/css">
+				div.content form
+				{
+					display: none;
+				}
+			</style>
+		</noscript>
+	</head>
+	<body>
+		<div class="content">
+			<div class="github-fork-ribbon-wrapper right">
+				<div class="github-fork-ribbon">
+			    	<a href="https://github.com/Eun/LegalNoticeCreator">Fork me on GitHub</a>
+			    </div>
+			</div>
+			<h1>Legal Notice Creator</h1>
+			<h2>What is this?</h2>
+			<p>This allows you to show a notice before the login. No additional software is needed just a Windows Operating system.</p>
+			<a target="_blank" href="sample-large.png"><img src="sample.png" alt="sample"/></a>
+			<h2>How does it work?</h2>
+			<ol>
+				<li>Enter a Title and some Text.</li>
+				<li>Press Generate Notice.</li>
+				<li>Import the downloaded file to your Regestry (Just open the file).</li>
+			</ol>
+			<h2>Howto get back to normal?</h2>
+			<p>Download &amp; install Reset Notice.</p>
+			<h2>Generator</h2>
+			<noscript>
+				<p>This application needs JavaScript!</p>
+				<p>To use this application you need to enable JavaScript in your browser!</p>
+			</noscript>
+			<form accept-charset="UTF-8" onsubmit="return false">
+				<input type="text" id="title" placeholder="Some Title" />
+				<textarea id="text" placeholder="This is a Sample Notice&#10;Just write your Text here."></textarea>
+				<input type="button" value="Generate Permanent Notice" onclick="generateNotice()" />
+				<input type="button" value="Generate One-Time Notice" onclick="generateOneTimeNotice()" />
+				<input type="button" value="Reset Notice" onclick="generateReset()" />
+			</form>
+		</div>
+	</body>
+</html>
